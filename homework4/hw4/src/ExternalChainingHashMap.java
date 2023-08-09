@@ -101,31 +101,44 @@ public class ExternalChainingHashMap<K, V> {
      * map, return the old value associated with it
      * @throws java.lang.IllegalArgumentException if key or value is null
      */
-    public V put(K key, V value) { //given a key with a value
-        if (key == null || value == null) { //check if key or val inputed is null (cant insert if it is)
+      public V put(K key, V value) {
+        if (key == null || value == null) {
             throw new IllegalArgumentException("The entered key is null, or the entered value is null!");
         }
-        if ((size + 1) / (double) table.length > MAX_LOAD_FACTOR) { //check if we're > the maxloadfactor. resize if yes. cast to double since we dont want to truncate the decimal
-            resizeBackingTable(2 * table.length + 1); //resize
+
+        if ((size + 1) / (double) table.length > MAX_LOAD_FACTOR) {
+            resizeBackingTable(2 * table.length + 1);
         }
-        int ind = Math.abs(key.hashCode() % table.length); //compression function;convert key into a ind
-        if (table[ind] == null) { //bucket is empty
-            table[ind] = new ExternalChainingMapEntry<>(key, value); //create an entry and place it in the bucket
-        } else { //bucket is not empty, need to see where to place it
-            ExternalChainingMapEntry<K, V> entry = table[ind]; //start at the front of the bucket
-            while (entry.getNext() != null && !entry.getKey().equals(key)) { //keep going until entry.next is null meaning we place it there, or we find a duplicate key
-                entry = entry.getNext();
-            }
-            if (entry.getKey().equals(key)) { //is our key a duplicate? replace it and return oldvalue if yes
+
+        int ind = Math.abs(key.hashCode() % table.length);
+
+        if (table[ind] == null) {
+            table[ind] = new ExternalChainingMapEntry<>(key, value);
+            size++;
+            return null;
+        } else {
+            ExternalChainingMapEntry<K, V> entry = table[ind];
+
+            if (entry.getKey().equals(key)) {
                 V oldValue = entry.getValue();
                 entry.setValue(value);
                 return oldValue;
-            } else { //no duplicate key? just insert it
-                entry.setNext(new ExternalChainingMapEntry<>(key, value));
             }
+
+            while (entry.getNext() != null && !entry.getNext().getKey().equals(key)) {
+                entry = entry.getNext();
+            }
+
+            if (entry.getNext() != null && entry.getNext().getKey().equals(key)) {
+                V oldValue = entry.getNext().getValue();
+                entry.getNext().setValue(value);
+                return oldValue;
+            }
+
+            entry.setNext(new ExternalChainingMapEntry<>(key, value));
+            size++;
+            return null;
         }
-        size++;
-        return null;
     }
 
     /**
@@ -136,33 +149,40 @@ public class ExternalChainingHashMap<K, V> {
      * @throws java.lang.IllegalArgumentException if key is null
      * @throws java.util.NoSuchElementException   if the key is not in the map
      */
-    public V remove(K key) {
+     public V remove(K key) {
         if (key == null) {
             throw new IllegalArgumentException("The key entered is null!");
         }
-        int ind = Math.abs(key.hashCode() % table.length); //get the ind (compression)
-        if (table[ind] == null) { //check if ind even exists in the table LOL
+
+        int ind = Math.abs(key.hashCode() % table.length);
+
+        if (table[ind] == null) {
             throw new NoSuchElementException("The key entered does not exist in this map.");
         }
-        if (table[ind].getKey() == key) { //tryna remove that first spot
+
+        if (table[ind].getKey().equals(key)) {
             V oldValue = table[ind].getValue();
             table[ind] = table[ind].getNext();
             size--;
             return oldValue;
-        } else {
-            ExternalChainingMapEntry<K, V> entry = table[ind];
-            while (entry.getNext() != null && !entry.getKey().equals(key)) {
-                entry = entry.getNext();
-            }
-            if (entry.getKey().equals(key)) {
-                V oldValue = table[ind].getValue();
-                table[ind] = table[ind].getNext();
-                size--;
-                return oldValue;
-            } else {
-                throw new NoSuchElementException("The key entered does not exist in this map.");
-            }
         }
+
+        ExternalChainingMapEntry<K, V> previous = table[ind];
+        ExternalChainingMapEntry<K, V> current = previous.getNext();
+
+        while (current != null && !current.getKey().equals(key)) {
+            previous = current;
+            current = current.getNext();
+        }
+
+        if (current != null && current.getKey().equals(key)) {
+            V oldValue = current.getValue();
+            previous.setNext(current.getNext());
+            size--;
+            return oldValue;
+        }
+
+        throw new NoSuchElementException("The key entered does not exist in this map.");
     }
 
     /**
@@ -219,17 +239,20 @@ public class ExternalChainingHashMap<K, V> {
      *
      * @return the set of keys in this map
      */
-    public Set<K> keySet() {
+   public Set<K> keySet() {
         Set<K> keys = new HashSet<>();
-        for (ExternalChainingMapEntry entry : table) {
-            if (entry != null) {
-                keys.add((K) entry.getKey());
-                while (entry.getNext() != null) {
-                    entry = entry.getNext();
-                    keys.add((K) entry.getKey());
-                }
+        int count = 0;
+        
+        for (ExternalChainingMapEntry<K, V> entry : table) {
+            while (entry != null) {
+                keys.add(entry.getKey());
+                entry = entry.getNext();
+                count++;
+
+                if (count == size) return keys;
             }
         }
+
         return keys;
     }
 
@@ -243,17 +266,20 @@ public class ExternalChainingHashMap<K, V> {
      *
      * @return list of values in this map
      */
-    public List<V> values() {
+  public List<V> values() {
         List<V> values = new ArrayList<>();
-        for (ExternalChainingMapEntry entry : table) {
-            if (entry != null) {
-                values.add((V) entry.getValue());
-                while (entry.getNext() != null) {
-                    entry = entry.getNext();
-                    values.add((V) entry.getValue());
-                }
+        int count = 0;
+
+        for (ExternalChainingMapEntry<K, V> entry : table) {
+            while (entry != null) {
+                values.add(entry.getValue());
+                entry = entry.getNext();
+                count++;
+
+                if (count == size) return values;
             }
         }
+
         return values;
     }
 
@@ -279,19 +305,29 @@ public class ExternalChainingHashMap<K, V> {
      *                                            number of items in the hash
      *                                            map
      */
-    public void resizeBackingTable(int length) {
-        if (length < 0 || size < length) {
-            throw new IllegalArgumentException("The length given cannot be less than "
-                    + "the current amount of items and cannot be less than 0.");
+      public void resizeBackingTable(int length) {
+        if (length < size) {
+            throw new IllegalArgumentException("The length given cannot be less than the current amount of items.");
         }
-        ExternalChainingMapEntry<K, V>[] table2 = new ExternalChainingMapEntry[length];
-        for (ExternalChainingMapEntry entry : table) {
-            if (entry != null) {
-                int index = Math.abs(entry.getKey().hashCode() % table2.length);
-                table2[index] = entry;
+
+        ExternalChainingMapEntry<K, V>[] newTable = new ExternalChainingMapEntry[length];
+        for (ExternalChainingMapEntry<K, V> entry : table) {
+            while (entry != null) {
+                int ind = Math.abs(entry.getKey().hashCode() % newTable.length);
+
+                if (newTable[ind] == null) {
+                    newTable[ind] = new ExternalChainingMapEntry<>(entry.getKey(), entry.getValue());
+                } else {
+                    ExternalChainingMapEntry<K, V> current = newTable[ind];
+                    while (current.getNext() != null) {
+                        current = current.getNext();
+                    }
+                    current.setNext(new ExternalChainingMapEntry<>(entry.getKey(), entry.getValue()));
+                }
+                entry = entry.getNext();
             }
         }
-        table = table2;
+        table = newTable;
     }
 
     /**
