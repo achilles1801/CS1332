@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
  * @author Majd Khawaldeh
  * @version 1.0
  * @userid Majd
- * @GTID 903677841
  */
 public class SinglyLinkedList<T> {
 
