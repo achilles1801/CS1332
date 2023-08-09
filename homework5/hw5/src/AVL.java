@@ -355,13 +355,26 @@ public class AVL<T extends Comparable<? super T>> {
         if (curr == null || data.getData() != null) {
             return;
         }
+           // Traverse the left subtree
+    if (count.getData() < (size + 1) / 2) {
         medianHelper(curr.getLeft(), count, data);
+    }
+
+    // Increase the count if the median hasn't been found yet
+    if (data.getData() == null) {
         count.setData(count.getData() + 1);
-        if (count.getData() == (size + 1) / 2) {
-            data.setData(curr.getData());
-            return;
-        }
+    }
+
+    // Check if the current node is the median
+    if (count.getData() == (size + 1) / 2) {
+        data.setData(curr.getData());
+        return;
+    }
+
+    // Traverse the right subtree
+    if (count.getData() < (size + 1) / 2) {
         medianHelper(curr.getRight(), count, data);
+    }
 
     }
 
