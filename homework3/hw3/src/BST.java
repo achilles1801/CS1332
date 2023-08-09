@@ -11,7 +11,6 @@ import java.util.Queue;
  * @author Majd Khawaldeh
  * @version 1.0
  * @userid Majd
- * @GTID 903677841
  * <p>
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
  * Office Hours with Indira
