@@ -10,7 +10,6 @@ import java.util.Set;
  * @author Majd Khawaldeh
  * @version 1.0
  * @userid majd
- * @GTID 903677841
  * <p>
  * Collaborators: LIST ALL COLLABORATORS YOU WORKED WITH HERE
  * <p>
