@@ -29,77 +29,37 @@ public class SinglyLinkedList<T> {
      */
 
 
-    public void addAtIndex(int index, T data) {
-        /*if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index should be between 0 and size");
-        } else if (data == null) {
-            throw new IllegalArgumentException("Data must not be null!");
-        }
-        SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<T>(data);
-        if (head == null) { //edge case for empty list
-            head = newNode;
-            tail = newNode;
-        } else { //at least one node
-            SinglyLinkedListNode<T> current = head;
-            SinglyLinkedListNode<T> previous = null;
-            for (int i = 0; i < index; i++) { // gets me to the node I want
-                previous = current;
-                current = current.getNext();
-            }
-            //im currently at the node i want
-            if (previous == null) { //if i want to insert at the front
-                head = newNode;
-            } else {
-                previous.setNext(newNode); //point at my newNode
-            }
-            if (previous == tail) { //inserting at the back
-                tail = newNode;
-            }
-            newNode.setNext(current); //have my newNode point at current (inserting it)
-        }
-
-        size++;
-    }*/
-        if (index < 0 || index > size) {
-            throw new IndexOutOfBoundsException("Index should be between 0 and size");
-        } else if (data == null) {
-            throw new IllegalArgumentException("Data must not be null!");
-        }
-        SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<>(data);
-        if (head == null) {
-            head = newNode;
-            tail = newNode;
-        } else if (index == 0) {
-            newNode.setNext(head);
-            head = newNode;
-        } else if (index == size) {
-            tail.setNext(newNode);
-            tail = newNode;
-        } else {
-            SinglyLinkedListNode<T> curr = head;
-            int pos = 0;
-            while (curr != null) {
-                if (pos == index - 1) {
-                    newNode.setNext(curr.getNext());
-                    curr.setNext(newNode);
-                    break;
-                }
-                curr = curr.getNext();
-                pos++;
-            }
-            /*SinglyLinkedListNode<T> prev = null;
-            for (int i = 0; i < index; i++) {
-                prev = curr;
-                curr = curr.getNext();
-            }
-            newNode.setNext(curr);
-            prev.setNext(newNode);*/
-
-
-        }
-        size++;
-
+ public void addAtIndex(int index, T data) {
+    if (index < 0 || index > size) {
+        throw new IndexOutOfBoundsException("Index should be between 0 and size");
+    } else if (data == null) {
+        throw new IllegalArgumentException("Data must not be null!");
     }
+
+    SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<T>(data);
+    
+    // If list is empty
+    if (head == null) {
+        head = newNode;
+        tail = newNode;
+    } else if (index == 0) {  // Insert at the start
+        newNode.setNext(head);
+        head = newNode;
+    } else if (index == size) {  // Insert at the end
+        tail.setNext(newNode);
+        tail = newNode;
+    } else {  // Insert in the middle
+        SinglyLinkedListNode<T> current = head;
+        for (int i = 0; i < index - 1; i++) { // traverse to the node before the desired position
+            current = current.getNext();
+        }
+        newNode.setNext(current.getNext());
+        current.setNext(newNode);
+    }
+
+    size++;
+}
+
 
 
     /**
@@ -110,29 +70,31 @@ public class SinglyLinkedList<T> {
      * @param data the data to add to the front of the list
      * @throws java.lang.IllegalArgumentException if data is null
      */
-    public void addToFront(T data) {
-        /*if (data == null) {
+      public void addToFront(T data) {
+
+        if (data == null) {
+
             throw new IllegalArgumentException("Data can not be null.");
+
         }
 
         SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<T>(data);
+
         newNode.setNext(head);
+
         head = newNode;
+
         if (size == 0) {
+
             tail = newNode;
+
         }
+
         size++;
-    }*/
-        SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<>(data);
-        if (size == 0) {
-            head = newNode;
-            tail = newNode;
-        } else {
-            newNode.setNext(head);
-            head = newNode;
-        }
-        size++;
+
     }
+
+
 
 
     /**
@@ -143,30 +105,35 @@ public class SinglyLinkedList<T> {
      * @param data the data to add to the back of the list
      * @throws java.lang.IllegalArgumentException if data is null
      */
-    public void addToBack(T data) {
-        /* if (data == null) {
+      public void addToBack(T data) {
+
+        if (data == null) {
+
             throw new IllegalArgumentException("Data can not be null.");
+
         }
+
         SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<T>(data);
+
         if (size == 0) {
+
             head = newNode;
+
         } else {
+
             tail.setNext(newNode);
+
         }
+
         tail = newNode;
+
         size++;
 
-    }*/
-        SinglyLinkedListNode<T> newNode = new SinglyLinkedListNode<>(data);
-        if (size == 0) {
-            head = newNode;
-            tail = newNode;
-        } else {
-            tail.setNext(newNode);
-            tail = newNode;
-        }
-        size++;
+
+
     }
+
+
 
     /**
      * Removes and returns the element at the specified index.
@@ -210,43 +177,7 @@ public class SinglyLinkedList<T> {
         return removedData;
 
     }
-        /*if (index == 0) {
-            removedData = head.getData();
-            head = head.getNext();
-            if (head == null) {
-                tail = null;
-            }
-            size--;
-            return removedData;
-        }
-        if (head == null) {
-            tail = null;
-            return null;
-        } else if (head.getNext() == null) {
-            removedData = head.getData();
-            head = null;
-            tail = null;
-            size--;
-            return removedData;
-
-        } else {
-
-            SinglyLinkedListNode<T> current = head;
-            int position = 0;
-            while (position < index - 1) {
-                current = current.getNext();
-                position++;
-            }
-
-            removedData = current.getNext().getData();
-            if (current.getNext() == tail) {
-                tail = current;
-            }
-            current.setNext(current.getNext().getNext());
-            size--;
-            return removedData;
-
-        }*/
+      
 
 
     /**
@@ -267,21 +198,6 @@ public class SinglyLinkedList<T> {
         }
         size--;
         return removed;
-        /*if (size == 0) {
-            throw new NoSuchElementException("The list is empty. There's nothing to remove!");
-        }
-        T removedData = head.getData();
-        if (head.getNext() == null) {
-            head = null;
-            tail = null;
-        } else {
-            head = head.getNext();
-        }
-        size--;
-        return removedData;
-
-
-    }*/
 
 
     }
@@ -332,26 +248,6 @@ public class SinglyLinkedList<T> {
 
 
 
-        /*if (size == 0) { //empty list
-            throw new NoSuchElementException("The list is empty. There's nothing to remove!");
-        }
-        if (head.getNext() == null) { //one node
-
-            return removeFromFront();
-        }
-
-        SinglyLinkedListNode<T> current = head;
-        SinglyLinkedListNode<T> previous = null;
-
-        while (current.getNext() != null) {
-            previous = current;
-            current = current.getNext();
-        }
-        previous.setNext(null);
-        tail = previous;
-        size--;
-        return current.getData();*/
-
 
     /**
      * Returns the element at the specified index.
@@ -362,56 +258,29 @@ public class SinglyLinkedList<T> {
      * @return the data stored at the index in the list
      * @throws java.lang.IndexOutOfBoundsException if index < 0 or index >= size
      */
-    public T get(int index) {
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("index out of bounds");
-        }
-        if (head == null) {
-            return null;
-        }
-        T data;
-        if (index == 0) {
-            data = head.getData();
-        } else if (index == size - 1) {
-            data = tail.getData();
-        } else {
-            SinglyLinkedListNode<T> curr = head;
-            for (int i = 0; i < index; i++) {
-                curr = curr.getNext();
-
-            }
-            data = curr.getData();
-        }
-        return data;
-
-
+ public T get(int index) {
+    if (index < 0 || index >= size) {
+        throw new IndexOutOfBoundsException("Index must be between 0 and size.");
     }
 
+    if (index == 0) {
+        return head.getData();
+    }
+    
+    if (index == size - 1) {
+        return tail.getData();
+    }
+
+    SinglyLinkedListNode<T> current = head;
+    for (int position = 0; position < index; position++) {
+        current = current.getNext();
+    }
+
+    return current.getData();
+}
 
 
 
-
-
-        /*
-        if (index < 0 || index >= size) {
-            throw new IndexOutOfBoundsException("Index must be between 0 and size.");
-        }
-        if (index == 0 || head.getNext() == null) {
-            return head.getData();
-        } else {
-            SinglyLinkedListNode<T> current = head;
-
-            int position = 0;
-            while (position < index) {
-
-                current = current.getNext();
-                position++;
-            }
-
-            return current.getData();
-        }
-
-    }*/
 
     /**
      * Returns whether or not the list is empty.
@@ -495,46 +364,7 @@ public class SinglyLinkedList<T> {
 
     }
 
-/*
-        if (data == null) { //invalid input
-            throw new IllegalArgumentException("Data must not be null!");
-        }
-        if (size == 0) { //empty list
-            throw new NoSuchElementException("Data has not been found!");
-        }
 
-        SinglyLinkedListNode<T> current = head; //keep track of head
-        SinglyLinkedListNode<T> prev = null; // keep track of one before
-        SinglyLinkedListNode<T> lastOccurrenceNode = null; //
-        SinglyLinkedListNode<T> prevLastOccurrenceNode = null; //
-
-        while (current != null) {
-            if (current.getData().equals(data)) {
-                prevLastOccurrenceNode = prev;
-                lastOccurrenceNode = current;
-            }
-            prev = current;
-            current = current.getNext();
-        }
-
-        if (lastOccurrenceNode != null) {
-            if (lastOccurrenceNode == head) {
-                head = lastOccurrenceNode.getNext();
-            } else {
-                prevLastOccurrenceNode.setNext(lastOccurrenceNode.getNext());
-            }
-
-            if (lastOccurrenceNode == tail) {
-                tail = prevLastOccurrenceNode;
-            }
-
-            size--;
-            return lastOccurrenceNode.getData();
-        }
-
-        return null;
-    }
-*/
 
     /**
      * Returns an array representation of the linked list.
