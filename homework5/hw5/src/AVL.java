@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
  * @author Majd Khawaldeh
  * @version 1.0
  * @userid majd
- * @GTID 903677841
  */
 public class AVL<T extends Comparable<? super T>> {
     // DO NOT ADD OR MODIFY INSTANCE VARIABLES.
